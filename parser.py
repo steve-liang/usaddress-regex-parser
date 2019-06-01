@@ -2,34 +2,32 @@ import re
 from CaseInsensitiveDict import CaseInsensitiveDict
 import pandas as pd
 
-suffix_csv = pd.read_csv('./suffix.csv')
-dir_csv = pd.read_csv('./directions.csv')
-suffix_dict = suffix_csv.set_index('input')['output'].to_dict()
-suffix_i = CaseInsensitiveDict(suffix_dict)
-dir_dict = dir_csv.set_index('input')['output'].to_dict()
-dir_i = CaseInsensitiveDict(dir_dict)
-def replace_suffix(m):
-    return suffix_i.get(m.group('key'), m.group(0))
-def replace_dir(m):
-    return dir_i.get(m.group('key'), m.group(0))
+_suffix_csv = pd.read_csv('./suffix.csv')
+_dir_csv = pd.read_csv('./directions.csv')
+_suffix_dict = _suffix_csv.set_index('input')['output'].to_dict()
+_suffix_i = CaseInsensitiveDict(_suffix_dict)
+_dir_dict = _dir_csv.set_index('input')['output'].to_dict()
+_dir_i = CaseInsensitiveDict(_dir_dict)
+def _replace_suffix(m):
+    return _suffix_i.get(m.group('key'), m.group(0))
+def _replace_dir(m):
+    return _dir_i.get(m.group('key'), m.group(0))
 
 
-regexp_unit_suite = r'(?i)(SUITE|STE|UNIT|APT)s? \S+'
-regexp_hash = r'#\S+'
+_regexp_unit_suite = r'(?i)(SUITE|STE|UNIT|APT)s? \S+'
+_regexp_hash = r'#\S+'
 # note: stdlib.re doesn't work with \p{P} for punct
 # thanks to https://stackoverflow.com/questions/56161249/delete-all-punctuation-symbols-exept-underscore-and-curly-braces-in-string-in-py
-regexp_remove_punct_keep_hyphon = r'[^\w -]|(?<![\d])-|-(?![\d])'
-regexp = r'|'.join((regexp_unit_suite, regexp_hash, regexp_remove_punct_keep_hyphon))
-regexp_extra_space = r' +' 
-
-line = "-Unit #203-B,  300-499,   North State STREET Boulevard S @chicago, ste 3210b"
-line = re.sub(regexp, '', line)
-line = re.sub(r'(?P<key>[a-zA-Z]+)', replace_dir, line)
-line = re.sub(r'(?P<key>[a-zA-Z]+)', replace_suffix, line)
-line = re.sub(regexp_extra_space, ' ', line)
-
-# remove leading and trailing white spaces
-line = line.strip() 
+_regexp_remove_punct_keep_hyphon = r'[^\w -]|(?<![\d])-|-(?![\d])'
+_regexp = r'|'.join((_regexp_unit_suite, _regexp_hash, _regexp_remove_punct_keep_hyphon))
+_regexp_extra_space = r' +' 
 
 
-print(line)
+def parse_building_address(addr_string):
+    """ parse and standardize address field to street number, street name ONLY, removing suite/unit/ number 
+    """
+    addr_string = re.sub(_regexp, '', addr_string)
+    addr_string = re.sub(r'(?P<key>[a-zA-Z]+)', _replace_dir, addr_string)
+    addr_string = re.sub(r'(?P<key>[a-zA-Z]+)', _replace_suffix, addr_string)
+    addr_string = re.sub(_regexp_extra_space, ' ', addr_string)
+    return addr_string.strip()
