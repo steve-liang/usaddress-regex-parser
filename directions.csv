@@ -1,0 +1,21 @@
+input,output
+E,E
+East,E
+N,N
+North,N
+NE,NE
+Northeast,NE
+North East,NE
+NW,NW
+Northwest,NW
+North West,NW
+S,S
+South,S
+SE,SE
+Southeast,SE
+South East,SE
+SW,SW
+Southwest,SW
+South West,SW
+W,W
+West,W
