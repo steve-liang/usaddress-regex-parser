@@ -30,4 +30,4 @@ def parse_building_address(addr_string):
     addr_string = re.sub(r'(?P<key>[a-zA-Z]+)', _replace_dir, addr_string)
     addr_string = re.sub(r'(?P<key>[a-zA-Z]+)', _replace_suffix, addr_string)
     addr_string = re.sub(_regexp_extra_space, ' ', addr_string)
-    return addr_string.strip()
+    return addr_string.strip().upper()
